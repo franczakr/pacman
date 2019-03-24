@@ -9,6 +9,7 @@ FLOOR = 1
 
 pacman_pos = {"row": 2, "column": 2}
 pacman_sprite = "pacman_right"
+pacman_direction = (0,1)
 
 TILESIZE = 50
 MAPWIDTH = 16
@@ -80,28 +81,34 @@ def move_pacman(row_diff, column_diff):
 def main():
     pygame.init()
     pygame.display.set_caption("Pacman")
+    move_counter = 10
+    global pacman_direction
     while True:
-        if pygame.key.get_pressed()[pygame.K_RIGHT]:
-            move_pacman(0, 1)
-        elif pygame.key.get_pressed()[pygame.K_LEFT]:
-            move_pacman(0, -1)
-        elif pygame.key.get_pressed()[pygame.K_DOWN]:
-            move_pacman(1, 0)
-        elif pygame.key.get_pressed()[pygame.K_UP]:
-            move_pacman(-1, 0)
+        move_counter -= 1
+        if move_counter == 0:
+            move_counter = 10
+            move_pacman(pacman_direction[0], pacman_direction[1])
         # obsługa eventów i klawiszy
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-
+            elif event.type == KEYDOWN:
+                if event.key == K_RIGHT:
+                    pacman_direction = (0, 1)
+                elif event.key == K_LEFT:
+                    pacman_direction = (0, -1)
+                elif event.key == K_DOWN:
+                    pacman_direction = (1, 0)
+                elif event.key == K_UP:
+                    pacman_direction = (-1, 0)
         # rysowanie mapy
         for row in range(MAPHEIGHT):
             for column in range(MAPWIDTH):
                 DISPLAYSURF.blit(SPRITES[TILEMAP[row][column]], (TILESIZE*column, TILESIZE*row))
         DISPLAYSURF.blit(SPRITES[pacman_sprite], (TILESIZE * pacman_pos["column"], TILESIZE * pacman_pos["row"]))
         pygame.display.update()
-        clock.tick(30)
+        clock.tick(60)
 
 
 if __name__ == "__main__":

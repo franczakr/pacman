@@ -1,6 +1,8 @@
 import pygame
 import sys
 from pygame.locals import *
+import pygameMenu                # This imports classes and other things
+from pygameMenu.locals import *  # Import constants (like actions)
 
 
 # KLASY
@@ -56,11 +58,13 @@ TILEMAP = [
 # ZMIENNE
 clock = pygame.time.Clock()
 pacman = Pacman()
-fruits = {
-    (1, 5),
-    (2, 5),
-    (2, 6)
-}
+# DODAWANIE OWOCOW
+fruits = {(1,5),}
+for i in range(1,15):
+    for j in range(1,15):
+        if TILEMAP[i][j]== FLOOR:
+            fruits.add((i,j))
+
 
 
 # FUNKCJE
@@ -104,7 +108,7 @@ def main():
     pygame.init()
     pygame.display.set_caption("Pacman")
     move_counter = 0
-    max_move_counter = 30  # im mniej tym szybszy ruch pacmana
+    max_move_counter = 6  # im mniej tym szybszy ruch pacmana
     while True:
         if move_counter == max_move_counter:
             move_counter = 0

@@ -6,15 +6,16 @@ from random import randrange
 import os
 import pygame
 import main
+import csv
 
 # Import pygameMenu
 import pygameMenu
 from pygameMenu.locals import *
 
-ABOUT = ['PygameMenu {0}'.format(pygameMenu.__version__),
-         'Author: {0}'.format(pygameMenu.__author__),
+ABOUT = ['PAKMAN {0}'.format(0.7),
+         'Authors:',
          PYGAMEMENU_TEXT_NEWLINE,
-         'Email: {0}'.format(pygameMenu.__email__)]
+         "Rafal Franaczak   and   Dominik Guz"]
 COLOR_BACKGROUND = (128, 90, 128)
 COLOR_BLACK = (0, 0, 0)
 COLOR_WHITE = (255, 255, 255)
@@ -39,14 +40,7 @@ DIFFICULTY = ['EASY']
 
 # -----------------------------------------------------------------------------
 
-def change_difficulty(d):
-    """
-    Change difficulty of the game.
 
-    :return:
-    """
-    print('Selected difficulty: {0}'.format(d))
-    DIFFICULTY[0] = d
 
 
 def random_color():
@@ -58,70 +52,16 @@ def random_color():
     return randrange(0, 255), randrange(0, 255), randrange(0, 255)
 
 
-def play_function(difficulty, font):
+def play_function():
     main.main()
-    """
-    Main game function
-
-    :param difficulty: Difficulty of the game
-    :param font: Pygame font
-    :return: None
-    
-    difficulty = difficulty[0]
-    assert isinstance(difficulty, str)
-
-    if difficulty == 'EASY':
-        f = font.render('Playing as baby', 1, COLOR_WHITE)
-    elif difficulty == 'MEDIUM':
-        f = font.render('Playing as normie', 1, COLOR_WHITE)
-    elif difficulty == 'HARD':
-        f = font.render('Playing as god', 1, COLOR_WHITE)
-    else:
-        raise Exception('Unknown difficulty {0}'.format(difficulty))
-
-    # Draw random color and text
-    bg_color = random_color()
-    f_width = f.get_size()[0]
-
-    # Reset main menu and disable
-    # You also can set another menu, like a 'pause menu', or just use the same
-    # main_menu as the menu that will check all your input.
-    main_menu.disable()
-    main_menu.reset(1)
 
     while True:
 
         # Clock tick
         clock.tick(60)
 
-        # Application events
-        playevents = pygame.event.get()
-        for e in playevents:
-            if e.type == QUIT:
-                exit()
-            elif e.type == KEYDOWN:
-                if e.key == K_ESCAPE and main_menu.is_disabled():
-                    main_menu.enable()
-
-                    # Quit this function, then skip to loop of main-menu on line 217
-                    return
-
-        # Pass events to main_menu
-        main_menu.mainloop(playevents)
-
-        # Continue playing
-        surface.fill(bg_color)
-        surface.blit(f, ((WINDOW_SIZE[0] - f_width) / 2, WINDOW_SIZE[1] / 2))
-        pygame.display.flip()
-    """
-
 
 def main_background():
-    """
-    Function used by menus, draw on background while menu is active.
-
-    :return: None
-    """
     surface.fill(COLOR_BACKGROUND)
 
 
@@ -143,15 +83,7 @@ play_menu = pygameMenu.Menu(surface,
                             window_height=WINDOW_SIZE[1],
                             window_width=WINDOW_SIZE[0]
                             )
-# When pressing return -> play(DIFFICULTY[0], font)
-play_menu.add_option('Start243', play_function, DIFFICULTY,
-                     pygame.font.Font(pygameMenu.fonts.FONT_FRANCHISE, 10))
-"""play_menu.add_selector('Select difficulty', [('Easy', 'EASY'),
-                                             ('Medium', 'MEDIUM'),
-                                             ('Hard', 'HARD')],
-                       onreturn=None,
-                       onchange=change_difficulty)"""
-play_menu.add_option('Return to main menu', PYGAME_MENU_BACK)
+
 
 # ABOUT MENU
 about_menu = pygameMenu.TextMenu(surface,
@@ -178,6 +110,66 @@ for m in ABOUT:
 about_menu.add_line(PYGAMEMENU_TEXT_NEWLINE)
 about_menu.add_option('Return to menu', PYGAME_MENU_BACK)
 
+
+
+
+# LEADERBOARD_MENU
+board_menu = pygameMenu.TextMenu(surface,
+                                 bgfun=main_background,
+                                 color_selected=COLOR_WHITE,
+                                 font=pygameMenu.fonts.FONT_BEBAS,
+                                 font_color=COLOR_BLACK,
+                                 font_size_title=15,
+                                 font_title=pygameMenu.fonts.FONT_8BIT,
+                                 menu_color=MENU_BACKGROUND_COLOR,
+                                 menu_color_title=COLOR_WHITE,
+                                 menu_height=int(WINDOW_SIZE[1] * 0.6),
+                                 menu_width=int(WINDOW_SIZE[0] * 0.6),
+                                 onclose=PYGAME_MENU_DISABLE_CLOSE,
+                                 option_shadow=False,
+                                 text_color=COLOR_BLACK,
+                                 text_fontsize=16,
+                                 title='Leaderboard',
+                                 window_height=WINDOW_SIZE[1],
+                                 window_width=WINDOW_SIZE[0]
+                                 )
+
+# Read the csv.
+with open('L.csv', 'r',) as file:
+    rd=csv.reader(file, delimiter=";")
+    score_list = list(rd)
+    i=1
+    board_menu.add_line("POS             NAME              SCORE")
+    for row in score_list:
+        board_menu.add_line(str(i)+"                                  "+row[0]+"                             "+row[1])
+        i=i+1
+board_menu.add_line(PYGAMEMENU_TEXT_NEWLINE)
+board_menu.add_option('Return to menu', PYGAME_MENU_BACK)
+
+# TIPS_MENU
+tip_menu = pygameMenu.TextMenu(surface,
+                                 bgfun=main_background,
+                                 color_selected=COLOR_WHITE,
+                                 font=pygameMenu.fonts.FONT_BEBAS,
+                                 font_color=COLOR_BLACK,
+                                 font_size_title=15,
+                                 font_title=pygameMenu.fonts.FONT_8BIT,
+                                 menu_color=MENU_BACKGROUND_COLOR,
+                                 menu_color_title=COLOR_WHITE,
+                                 menu_height=int(WINDOW_SIZE[1] * 0.6),
+                                 menu_width=int(WINDOW_SIZE[0] * 0.6),
+                                 onclose=PYGAME_MENU_DISABLE_CLOSE,
+                                 option_shadow=False,
+                                 text_color=COLOR_BLACK,
+                                 text_fontsize=16,
+                                 title='tips',
+                                 window_height=WINDOW_SIZE[1],
+                                 window_width=WINDOW_SIZE[0]
+                                 )
+tip_menu.add_line("tips will be added SOON...")
+tip_menu.add_line(PYGAMEMENU_TEXT_NEWLINE)
+tip_menu.add_option('Return to menu', PYGAME_MENU_BACK)
+
 # MAIN MENU
 main_menu = pygameMenu.Menu(surface,
                             bgfun=main_background,
@@ -195,9 +187,9 @@ main_menu = pygameMenu.Menu(surface,
                             window_height=WINDOW_SIZE[1],
                             window_width=WINDOW_SIZE[0]
                             )
-main_menu.add_option('Play', play_menu)
-main_menu.add_option('Tips', PYGAME_MENU_EXIT)
-main_menu.add_option('Leaderboards', PYGAME_MENU_EXIT)
+main_menu.add_option('Play', play_function)
+main_menu.add_option('Tips', tip_menu)
+main_menu.add_option('Leaderboards', board_menu)
 main_menu.add_option('About', about_menu)
 main_menu.add_option('Quit', PYGAME_MENU_EXIT)
 

@@ -60,9 +60,10 @@ pacman = Pacman()
 score = 0
 lives = 5
 font_name = pygame.font.match_font('comicsansms')
+# DODAWANIE OWOCOW
 fruits = set()
-for x in range(MAPWIDTH):
-    for y in range(MAPHEIGHT):
+for x in range(1,MAPWIDTH-1):
+    for y in range(1,MAPHEIGHT-1):
         if TILEMAP[x][y] == FLOOR:
             fruits.add((x, y))
 tiles_to_repaint = set()
@@ -158,7 +159,7 @@ def main():
                 elif event.key == K_UP:
                     pacman.direction = (-1, 0)
         # rysowanie mapy
-        repaint_map()  #
+        repaint_map()  # odświeża tylko pola, które trzeba odświeżyć
         # rysowanie pacmana (średnia ważona starej i nowej pozycji, aby ruch był płynny)
         DISPLAYSURF.blit(PACMAN_SPRITES[pacman.sprite],
                          (((TILESIZE * pacman.old_pos["column"] * (max_move_counter-move_counter)) +

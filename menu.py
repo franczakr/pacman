@@ -5,13 +5,14 @@ from pygame.locals import *
 from random import randrange
 import os
 import pygame
-import main
+import game_engine
 import csv
-
-name="temporary"
-# Import pygameMenu
 import pygameMenu
 from pygameMenu.locals import *
+
+name = "temporary"
+# Import pygameMenu
+
 
 ABOUT = ['PAKMAN {0}'.format(0.7),
          'Authors:',
@@ -42,8 +43,6 @@ DIFFICULTY = ['EASY']
 # -----------------------------------------------------------------------------
 
 
-
-
 def random_color():
     """
     Return random color.
@@ -54,7 +53,7 @@ def random_color():
 
 
 def play_function():
-    main.main(name)
+    game_engine.main(name)
 
     while True:
 
@@ -137,13 +136,13 @@ board_menu = pygameMenu.TextMenu(surface,
 
 # Read the csv.
 with open('L.csv', 'r',) as file:
-    rd=csv.reader(file, delimiter=";")
+    rd = csv.reader(file, delimiter=";")
     score_list = list(rd)
-    i=1
+    i = 1
     board_menu.add_line("POS             SCORE              NAME")
     for row in score_list:
         board_menu.add_line(str(i)+"                                  "+row[0]+"                             "+row[1])
-        i=i+1
+        i = i+1
     file.close()
 board_menu.add_line(PYGAMEMENU_TEXT_NEWLINE)
 board_menu.add_option('Return to menu', PYGAME_MENU_BACK)
@@ -195,11 +194,12 @@ main_menu.add_option('Leaderboards', board_menu)
 main_menu.add_option('About', about_menu)
 main_menu.add_option('Quit', PYGAME_MENU_EXIT)
 
+
 # -----------------------------------------------------------------------------
 # Main loop
 def mainloop(namen):
     global name
-    name=namen
+    name = namen
     while True:
 
         # Tick

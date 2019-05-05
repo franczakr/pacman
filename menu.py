@@ -18,11 +18,11 @@ ABOUT = ['PAKMAN {0}'.format(0.7),
          'Authors:',
          PYGAMEMENU_TEXT_NEWLINE,
          "Rafal Franaczak   and   Dominik Guz"]
-COLOR_BACKGROUND = (128, 90, 128)
-COLOR_BLACK = (0, 0, 0)
-COLOR_WHITE = (255, 255, 255)
+COLOR_BACKGROUND = (77, 0, 0)
+COLOR_BLACK = (190, 20, 50)
+COLOR_WHITE = (105, 0, 21)
 FPS = 60.0
-MENU_BACKGROUND_COLOR = (228, 155, 96)
+MENU_BACKGROUND_COLOR = (0, 0, 0)
 WINDOW_SIZE = (800, 800)
 
 # -----------------------------------------------------------------------------
@@ -43,14 +43,6 @@ DIFFICULTY = ['EASY']
 # -----------------------------------------------------------------------------
 
 
-def random_color():
-    """
-    Return random color.
-
-    :return: Color tuple
-    """
-    return randrange(0, 255), randrange(0, 255), randrange(0, 255)
-
 
 def play_function():
     game_engine.main(name)
@@ -70,11 +62,13 @@ def main_background():
 play_menu = pygameMenu.Menu(surface,
                             bgfun=main_background,
                             color_selected=COLOR_WHITE,
-                            font=pygameMenu.fonts.FONT_BEBAS,
+                            font="gothic.ttf",
                             font_color=COLOR_BLACK,
                             font_size=25,
                             menu_alpha=90,
+                            font_size_title=50,
                             menu_color=MENU_BACKGROUND_COLOR,
+                            menu_color_title=COLOR_WHITE,
                             menu_height=int(WINDOW_SIZE[1] * 0.7),
                             menu_width=int(WINDOW_SIZE[0] * 0.7),
                             onclose=PYGAME_MENU_DISABLE_CLOSE,
@@ -89,10 +83,10 @@ play_menu = pygameMenu.Menu(surface,
 about_menu = pygameMenu.TextMenu(surface,
                                  bgfun=main_background,
                                  color_selected=COLOR_WHITE,
-                                 font=pygameMenu.fonts.FONT_BEBAS,
+                                 font="gothic.ttf",
                                  font_color=COLOR_BLACK,
-                                 font_size_title=30,
-                                 font_title=pygameMenu.fonts.FONT_8BIT,
+                                 font_size_title=50,
+                                 font_title="gothic.ttf",
                                  menu_color=MENU_BACKGROUND_COLOR,
                                  menu_color_title=COLOR_WHITE,
                                  menu_height=int(WINDOW_SIZE[1] * 0.6),
@@ -100,7 +94,7 @@ about_menu = pygameMenu.TextMenu(surface,
                                  onclose=PYGAME_MENU_DISABLE_CLOSE,
                                  option_shadow=False,
                                  text_color=COLOR_BLACK,
-                                 text_fontsize=20,
+                                 text_fontsize=16,
                                  title='About',
                                  window_height=WINDOW_SIZE[1],
                                  window_width=WINDOW_SIZE[0]
@@ -117,10 +111,10 @@ about_menu.add_option('Return to menu', PYGAME_MENU_BACK)
 board_menu = pygameMenu.TextMenu(surface,
                                  bgfun=main_background,
                                  color_selected=COLOR_WHITE,
-                                 font=pygameMenu.fonts.FONT_BEBAS,
+                                 font="gothic.ttf",
                                  font_color=COLOR_BLACK,
-                                 font_size_title=15,
-                                 font_title=pygameMenu.fonts.FONT_8BIT,
+                                 font_size_title=50,
+                                 font_title="gothic.ttf",
                                  menu_color=MENU_BACKGROUND_COLOR,
                                  menu_color_title=COLOR_WHITE,
                                  menu_height=int(WINDOW_SIZE[1] * 0.6),
@@ -139,7 +133,7 @@ with open('L.csv', 'r',) as file:
     rd = csv.reader(file, delimiter=";")
     score_list = list(rd)
     i = 1
-    board_menu.add_line("POS             SCORE              NAME")
+    board_menu.add_line("POS                         SCORE                             NAME")
     for row in score_list:
         board_menu.add_line(str(i)+"                                  "+row[0]+"                             "+row[1])
         i = i+1
@@ -151,10 +145,10 @@ board_menu.add_option('Return to menu', PYGAME_MENU_BACK)
 tip_menu = pygameMenu.TextMenu(surface,
                                  bgfun=main_background,
                                  color_selected=COLOR_WHITE,
-                                 font=pygameMenu.fonts.FONT_BEBAS,
+                                 font="gothic.ttf",
                                  font_color=COLOR_BLACK,
-                                 font_size_title=15,
-                                 font_title=pygameMenu.fonts.FONT_8BIT,
+                                 font_size_title=50,
+                                 font_title="gothic.ttf",
                                  menu_color=MENU_BACKGROUND_COLOR,
                                  menu_color_title=COLOR_WHITE,
                                  menu_height=int(WINDOW_SIZE[1] * 0.6),
@@ -163,7 +157,7 @@ tip_menu = pygameMenu.TextMenu(surface,
                                  option_shadow=False,
                                  text_color=COLOR_BLACK,
                                  text_fontsize=16,
-                                 title='tips',
+                                 title='Tips',
                                  window_height=WINDOW_SIZE[1],
                                  window_width=WINDOW_SIZE[0]
                                  )
@@ -175,11 +169,13 @@ tip_menu.add_option('Return to menu', PYGAME_MENU_BACK)
 main_menu = pygameMenu.Menu(surface,
                             bgfun=main_background,
                             color_selected=COLOR_WHITE,
-                            font=pygameMenu.fonts.FONT_BEBAS,
+                            font="gothic.ttf",
                             font_color=COLOR_BLACK,
                             font_size=30,
                             menu_alpha=100,
+                            font_size_title=50,
                             menu_color=MENU_BACKGROUND_COLOR,
+                            menu_color_title=COLOR_WHITE,
                             menu_height=int(WINDOW_SIZE[1] * 0.6),
                             menu_width=int(WINDOW_SIZE[0] * 0.6),
                             onclose=PYGAME_MENU_DISABLE_CLOSE,

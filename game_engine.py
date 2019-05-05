@@ -37,7 +37,10 @@ PACMAN_SPRITES = {
 }
 
 GHOST_SPRITES = {
-    "red_ghost": pygame.image.load("res/red.png")
+    "red_ghost": pygame.image.load("res/red.png"),
+    "blue_ghost": pygame.image.load("res/blue.png"),
+    "pink_ghost": pygame.image.load("res/pink.png"),
+    "yellow_ghost": pygame.image.load("res/yellow.png")
 }
 
 
@@ -157,9 +160,9 @@ map = Map()
 map.init_map()
 map.init_fruits()
 pacman = Pacman(2, 2)
-red = Ghost(1, 1)
+red = Ghost(7, 7)
 name = ""
-font_name = pygame.font.match_font('comicsansms')
+font_name = "gothic.ttf"
 score = 0
 lives = 5
 
@@ -190,7 +193,7 @@ def write_score():
 
 def draw_text(text, size, x, y):
     font = pygame.font.Font(font_name, size)
-    text_surface = font.render(text, True, (255, 255, 255))
+    text_surface = font.render(text, True, (175, 20, 61))
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     DISPLAYSURF.blit(text_surface, text_rect)
@@ -284,8 +287,8 @@ def main(playername="mleko"):
             paint_sprite(pacman, True, pacman_move_counter, ticks % pacman_move_counter)
         paint_sprite(red, False, red_move_counter, ticks % red_move_counter)
 
-        draw_text("Score: " + str(score), 20, 400, 10)
-        draw_text("Player: " + name, 20, 140, 10)
+        draw_text("Score: " + str(score), 30, 380, 15)
+        draw_text("Player: " + name, 30, 140, 15)
         for i in range(lives):
             DISPLAYSURF.blit(TEXTURES["heart"], (500+40*i, 10))
 

@@ -2,3 +2,4 @@
 .flooignore
 venv/
 .idea/
+__pycache__/

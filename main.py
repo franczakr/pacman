@@ -1,5 +1,8 @@
 import pygame
 import sys
+import csv
+import operator
+import time
 from pygame.locals import *
 
 
@@ -10,6 +13,11 @@ class Pacman:
     sprite = "right"
     direction = (0, 1)
 
+class Red:
+    old_pos = {"row": 1, "column": 1}
+    pos = {"row": 1, "column": 1}
+    sprite = "right"
+    direction = (0, 1)
 
 # STAŁE
 # typy powierzchni
@@ -20,6 +28,13 @@ TILESIZE = 50
 MAPWIDTH = 16
 MAPHEIGHT = 16
 DISPLAYSURF = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE))
+black = (0, 0, 0)
+crimson = (105, 0, 21)
+
+
+# assigning values to X and Y variable
+X = 800
+Y = 800
 
 TEXTURES = {
     WALL: pygame.image.load("res/wall.png"),
@@ -34,6 +49,12 @@ PACMAN_SPRITES = {
     "down": pygame.image.load("res/pacman_d.png"),
     "left": pygame.image.load("res/pacman_l.png"),
 }
+
+
+GHOST_SPRITES = {
+    "red": pygame.image.load("res/red.png")
+}
+
 
 TILEMAP = [
     [WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL],
@@ -57,9 +78,15 @@ TILEMAP = [
 # ZMIENNE
 clock = pygame.time.Clock()
 pacman = Pacman()
+red=Red()
 score = 0
-lives = 5
+lives = 1
+invincible=False
+inv_time=400
+name="abc"
 font_name = pygame.font.match_font('comicsansms')
+
+
 # DODAWANIE OWOCOW
 fruits = set()
 for x in range(1,MAPWIDTH-1):
@@ -70,6 +97,29 @@ tiles_to_repaint = set()
 
 
 # FUNKCJE
+def write_score():
+    global score,name
+    tuple1=(int(score),name)
+    with open('L.csv', 'r') as file:
+        rd = csv.reader(file, delimiter=";")
+        score_list = list(rd)
+    file.close()
+    file = open('L.csv', 'w')
+    file.close()
+    with open('L.csv', 'w', newline='') as file:
+        for r in score_list:
+            r[0] = int(r[0])
+        tplist = [tuple(r) for r in score_list]
+        tplist.sort(key=operator.itemgetter(0), reverse=True)
+        tplist.append(tuple1)
+        tplist.sort(key=operator.itemgetter(0), reverse=True)
+        del tplist[10:]
+        file.truncate(0)
+        wrt = csv.writer(file, delimiter=";")
+        for t in tplist:
+            wrt.writerow(t)
+
+
 def draw_text(text, size, x, y):
     font = pygame.font.Font(font_name, size)
     text_surface = font.render(text, True, (255, 255, 255))
@@ -127,13 +177,41 @@ def move_pacman(row_diff, column_diff):
         if teleport:
             move_pacman(row_diff, column_diff)
 
+def move_red(row_diff, column_diff):
+    teleport = False
+    red.old_pos["row"] = Red.pos["row"]
+    red.old_pos["column"] = Red.pos["column"]
+    tiles_to_repaint.add((red.old_pos["row"], red.old_pos["column"]))
+    new_row = red.pos["row"] + row_diff
+    new_column = red.pos["column"] + column_diff
 
-def main():
-    global tiles_to_repaint
+    if new_row < 0:
+        new_row = MAPHEIGHT + new_row
+        teleport = True
+    if new_row >= MAPHEIGHT:
+        new_row = new_row - MAPHEIGHT
+        teleport = True
+    if new_column < 0:
+        new_column = MAPWIDTH + new_column
+        teleport = True
+    if new_column >= MAPWIDTH:
+        new_column = new_column - MAPWIDTH
+        teleport = True
+    if TILEMAP[new_row][new_column] != WALL:
+        red.pos["row"] = new_row
+        red.pos["column"] = new_column
+        tiles_to_repaint.add((red.pos["row"], red.pos["column"]))
+        if teleport:
+            move_red(row_diff, column_diff)
+
+
+def main(playername):
+    global tiles_to_repaint,lives,inv_time,invincible,name
+    name=playername
     pygame.init()
     pygame.display.set_caption("Pacman")
     move_counter = 0
-    max_move_counter = 20  # im mniej tym szybszy ruch pacmana, im więcej tym płynniejszy
+    max_move_counter = 30  # im mniej tym szybszy ruch pacmana, im więcej tym płynniejszy
     for row in range(MAPHEIGHT):
         for column in range(MAPWIDTH):
             DISPLAYSURF.blit(TEXTURES[TILEMAP[row][column]], (TILESIZE*column, TILESIZE*row))
@@ -144,6 +222,7 @@ def main():
             tiles_to_repaint = set()
             move_counter = 0
             move_pacman(pacman.direction[0], pacman.direction[1])
+            move_red(red.direction[0], red.direction[1])
         # obsługa eventów i klawiszy
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -166,15 +245,49 @@ def main():
                           (TILESIZE * pacman.pos["column"] * move_counter))/max_move_counter,
                           ((TILESIZE * pacman.old_pos["row"] * (max_move_counter - move_counter)) +
                           (TILESIZE * pacman.pos["row"] * move_counter))/max_move_counter))
-        draw_text("Score: " + str(score), 20, 200, 10)
+
+        DISPLAYSURF.blit(GHOST_SPRITES["red"],
+                         (((TILESIZE * red.old_pos["column"] * (max_move_counter - move_counter)) +
+                           (TILESIZE * red.pos["column"] * move_counter)) / max_move_counter,
+                          ((TILESIZE * red.old_pos["row"] * (max_move_counter - move_counter)) +
+                           (TILESIZE * red.pos["row"] * move_counter)) / max_move_counter))
+
+        draw_text("Score: " + str(score), 20, 400, 10)
+        draw_text("Player: " + playername, 20, 80, 10)
         for i in range(lives):
             DISPLAYSURF.blit(TEXTURES["heart"], (500+40*i, 10))
+
+        if (red.old_pos["column"] == pacman.old_pos["column"] and red.old_pos["row"] == pacman.old_pos["row"] and invincible==False):
+            lives = lives - 1
+            invincible=True
+            inv_time=400
+            if (lives < 1):
+                write_score()
+                display_surface = pygame.display.set_mode((X, Y))
+                pygame.display.set_caption('DEATH')
+                font = pygame.font.Font('gothic.ttf', 100)
+                text = font.render('YOU DIED', True, crimson, black)
+                textRect = text.get_rect()
+                textRect.center = (X // 2, Y // 2)
+                while True:
+                    display_surface.fill(black)
+                    display_surface.blit(text, textRect)
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYUP:
+                            time.sleep(5)
+                            pygame.display.quit()
+                            pygame.quit()
+                            sys.exit(1)
+                            quit()
+                        pygame.display.update()
+        if(invincible==True):
+            inv_time=inv_time-1
+            if(inv_time==0):
+                invincible=False
         move_counter += 1
         pygame.display.update()
         clock.tick(100)
 
 
-if __name__ == "__main__":
-    main()
 
 

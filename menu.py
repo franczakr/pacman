@@ -8,6 +8,7 @@ import pygame
 import main
 import csv
 
+name="temporary"
 # Import pygameMenu
 import pygameMenu
 from pygameMenu.locals import *
@@ -53,7 +54,7 @@ def random_color():
 
 
 def play_function():
-    main.main()
+    main.main(name)
 
     while True:
 
@@ -139,10 +140,11 @@ with open('L.csv', 'r',) as file:
     rd=csv.reader(file, delimiter=";")
     score_list = list(rd)
     i=1
-    board_menu.add_line("POS             NAME              SCORE")
+    board_menu.add_line("POS             SCORE              NAME")
     for row in score_list:
         board_menu.add_line(str(i)+"                                  "+row[0]+"                             "+row[1])
         i=i+1
+    file.close()
 board_menu.add_line(PYGAMEMENU_TEXT_NEWLINE)
 board_menu.add_option('Return to menu', PYGAME_MENU_BACK)
 
@@ -195,19 +197,23 @@ main_menu.add_option('Quit', PYGAME_MENU_EXIT)
 
 # -----------------------------------------------------------------------------
 # Main loop
-while True:
+def mainloop(namen):
+    global name
+    name=namen
+    while True:
 
-    # Tick
-    clock.tick(60)
+        # Tick
+        clock.tick(60)
 
-    # Application events
-    events = pygame.event.get()
-    for event in events:
-        if event.type == QUIT:
-            exit()
+        # Application events
+        events = pygame.event.get()
+        for event in events:
+            if event.type == QUIT:
+                exit()
 
-    # Main menu
-    main_menu.mainloop(events)
+        # Main menu
+        main_menu.mainloop(events)
 
-    # Flip surface
-    pygame.display.flip()
+        # Flip surface
+        pygame.display.flip()
+

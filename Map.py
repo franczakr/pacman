@@ -23,7 +23,6 @@ class Position:
 class Map:
     tilemap = []
     fruits = set()
-    tiles_to_repaint = set()
 
     def init_map(self):
         self.tilemap = [

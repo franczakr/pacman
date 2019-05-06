@@ -125,15 +125,13 @@ class Ghost:
 
 
             if (self.sprite == "pink_ghost"):
-                tmp.x=(red.pos.x+pacman.pos.x)/2
-                tmp.y = (red.pos.y + pacman.pos.y) / 2
+                tmp.x=(red.pos.x+pacman.pos.x)//2
+                tmp.y = (red.pos.y + pacman.pos.y) // 2
 
             if (self.sprite == "yellow_ghost"):
                 tmp.x = red.pos.x
                 tmp.y = red.pos.y
 
-            tmp.x=int(tmp.x)
-            tmp.y=int(tmp.y)
             if(map.tilemap[tmp.y][tmp.x] == WL):
                     tmp.x=pacman.pos.x
                     tmp.y=pacman.pos.y
@@ -237,7 +235,7 @@ def draw_text(text, size, x, y):
 def repaint_map(*sprites_on_map):
     global map
     for column in range(MAPWIDTH):
-            DISPLAYSURF.blit(TEXTURES[map.tilemap[0][column]], (TILESIZE*column, TILESIZE*0))
+            DISPLAYSURF.blit(TEXTURES[map.tilemap[0][column]], (TILESIZE*column, 0))
     for sprite in sprites_on_map:
         for pos in [sprite.pos, sprite.old_pos]:
             DISPLAYSURF.blit(TEXTURES[map.tilemap[pos.y][pos.x]], (TILESIZE * pos.x, TILESIZE * pos.y))
@@ -290,15 +288,16 @@ def main(playername="mleko"):
     ticks = 0
     pacman_move_counter = 30
     red_move_counter = 45
-    blue_move_counter=45
-    pink_move_counter=50
-    yellow_move_counter=50
+    blue_move_counter = 45
+    pink_move_counter = 50
+    yellow_move_counter = 50
     for row in range(MAPHEIGHT):
         for column in range(MAPWIDTH):
             DISPLAYSURF.blit(TEXTURES[map.tilemap[row][column]], (TILESIZE*column, TILESIZE*row))
     for fruit in map.fruits:
         DISPLAYSURF.blit(TEXTURES["fruit"], (TILESIZE * fruit.x, TILESIZE * fruit.y))
     while True:
+        repaint_map(pacman, red, blue, pink, yellow)  # odświeża tylko pola, które trzeba odświeżyć
         # obsługa eventów i klawiszy
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -324,8 +323,6 @@ def main(playername="mleko"):
             pink.move()
         if ticks % yellow_move_counter == 0:
             yellow.move()
-        # rysowanie mapy
-        repaint_map(pacman, red, blue,pink,yellow)  # odświeża tylko pola, które trzeba odświeżyć
 
         if not pacman.invincible or ticks % 5 != 0:  # miganie jeśli pacman jest niewrazliwy
             paint_sprite(pacman, True, pacman_move_counter, ticks % pacman_move_counter)

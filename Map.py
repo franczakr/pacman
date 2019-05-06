@@ -1,5 +1,5 @@
-FLOOR = 0
-WALL = 1
+FR = 0
+WL = 1
 TILESIZE = 50
 MAPWIDTH = 16
 MAPHEIGHT = 16
@@ -27,26 +27,26 @@ class Map:
 
     def init_map(self):
         self.tilemap = [
-            [WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL],
-            [WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL],
-            [WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL],
-            [FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL, WALL, FLOOR, FLOOR, WALL, WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR],
-            [FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL, WALL, FLOOR, FLOOR, WALL, WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR],
-            [WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL],
-            [WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL],
-            [WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL],
-            [WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL],
-            [WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL],
-            [WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL],
-            [FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL, WALL, FLOOR, FLOOR, WALL, WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR],
-            [FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL, WALL, FLOOR, FLOOR, WALL, WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR],
-            [WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL],
-            [WALL, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, FLOOR, WALL],
-            [WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL],
+            [WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL],
+            [WL, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, WL],
+            [WL, FR, WL, WL, WL, FR, WL, FR, WL, WL, FR, WL, WL, WL, FR, WL],
+            [FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, WL, FR, FR, FR],
+            [FR, FR, WL, FR, WL, WL, WL, FR, FR, WL, FR, FR, WL, WL, FR, FR],
+            [WL, FR, WL, FR, WL, FR, FR, FR, WL, WL, WL, FR, FR, FR, FR, WL],
+            [WL, FR, WL, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, WL],
+            [WL, FR, FR, FR, WL, WL, WL, FR, FR, FR, WL, WL, WL, WL, FR, WL],
+            [WL, FR, WL, FR, FR, FR, FR, FR, WL, FR, FR, FR, FR, FR, FR, WL],
+            [WL, FR, FR, FR, WL, WL, WL, FR, WL, FR, FR, FR, FR, FR, FR, WL],
+            [WL, FR, WL, FR, FR, FR, FR, FR, WL, WL, WL, WL, FR, WL, FR, WL],
+            [FR, FR, FR, FR, WL, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR],
+            [FR, FR, WL, FR, WL, WL, WL, FR, FR, WL, WL, WL, FR, FR, FR, FR],
+            [WL, FR, FR, FR, FR, FR, WL, FR, FR, WL, FR, FR, FR, WL, FR, WL],
+            [WL, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, WL],
+            [WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL],
         ]
 
     def init_fruits(self):
         for x in range(1, MAPWIDTH - 1):
             for y in range(1, MAPHEIGHT - 1):
-                if self.tilemap[y][x] == FLOOR:
+                if self.tilemap[y][x] == FR:
                     self.fruits.add(Position(x, y))

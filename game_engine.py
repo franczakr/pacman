@@ -9,8 +9,8 @@ from pygame.locals import *
 
 # STAŁE
 # typy powierzchni
-FLOOR = 0
-WALL = 1
+FR = 0
+WL = 1
 TILESIZE = 50
 MAPWIDTH = 16
 MAPHEIGHT = 16
@@ -23,8 +23,8 @@ X = MAPWIDTH * TILESIZE
 Y = MAPHEIGHT * TILESIZE
 
 TEXTURES = {
-    WALL: pygame.image.load("res/wall.png"),
-    FLOOR: pygame.image.load("res/floor.png"),
+    WL: pygame.image.load("res/wall.png"),
+    FR: pygame.image.load("res/floor.png"),
     "fruit": pygame.image.load("res/fruit.png"),
     "heart": pygame.image.load("res/heart.png")
 }
@@ -90,7 +90,7 @@ class Pacman:
         if new_x >= MAPWIDTH:
             new_x = new_x - MAPWIDTH
             teleport = True
-        if map.tilemap[new_y][new_x] != WALL:
+        if map.tilemap[new_y][new_x] != WL:
             self.pos = Position(new_x, new_y)
             if teleport:
                 self.move()
@@ -102,26 +102,53 @@ class Ghost:
     direction = "right"
     sprite = "red_ghost"
 
-    def __init__(self, x, y, sprite="red_ghost", type="closest"):
+    def __init__(self, x, y,  type="closest"):
         self.pos = Position(x, y)
         self.old_pos = Position(x, y)
-        self.sprite = sprite
         self.type = type
 
     def move(self):
         global map
+        x=int(pacman.pos.x)
+        y=int(pacman.pos.y)
+        tmp=Position(x,y)
         if self.type == "closest":
-            path = astar(map.tilemap, red.pos, pacman.pos)
+            if (self.sprite == "blue_ghost"):
+                if (pacman.direction == "right"):
+                    tmp.x =min(MAPWIDTH-2,(tmp.x+4))
+                if (pacman.direction == "left"):
+                    tmp.x =max((tmp.x-4),2)
+                if (pacman.direction == "up"):
+                    tmp.y =min((tmp.y+4),MAPHEIGHT-2)
+                if (pacman.direction == "down"):
+                    tmp.y =max((tmp.y-4),2)
+
+
+            if (self.sprite == "pink_ghost"):
+                tmp.x=(red.pos.x+pacman.pos.x)/2
+                tmp.y = (red.pos.y + pacman.pos.y) / 2
+
+            if (self.sprite == "yellow_ghost"):
+                tmp.x = red.pos.x
+                tmp.y = red.pos.y
+
+            tmp.x=int(tmp.x)
+            tmp.y=int(tmp.y)
+            if(map.tilemap[tmp.y][tmp.x] == WL):
+                    tmp.x=pacman.pos.x
+                    tmp.y=pacman.pos.y
+
+            path = astar(map.tilemap, self.pos, tmp)
             if path.__len__() > 1:
                 path = path[1]
-                if path.y > red.pos.y:
-                    red.direction = "down"
-                elif path.y < red.pos.y:
-                    red.direction = "up"
-                elif path.x > red.pos.x:
-                    red.direction = "right"
-                elif path.x < red.pos.x:
-                    red.direction = "left"
+                if path.y > self.pos.y:
+                    self.direction = "down"
+                elif path.y < self.pos.y:
+                    self.direction = "up"
+                elif path.x > self.pos.x:
+                    self.direction = "right"
+                elif path.x < self.pos.x:
+                    self.direction = "left"
         # elif type=="":               inne schematy ruchu duszków
         teleport = False
         self.old_pos = self.pos
@@ -148,7 +175,7 @@ class Ghost:
         if new_x >= MAPWIDTH:
             new_x = new_x - MAPWIDTH
             teleport = True
-        if map.tilemap[new_y][new_x] != WALL:
+        if map.tilemap[new_y][new_x] != WL:
             self.pos = Position(new_x, new_y)
             if teleport:
                 self.move()
@@ -159,8 +186,16 @@ clock = pygame.time.Clock()
 map = Map()
 map.init_map()
 map.init_fruits()
-pacman = Pacman(2, 2)
+pacman = Pacman(1, 1)
+# GHOSTS
 red = Ghost(7, 7)
+blue = Ghost(7, 8)
+blue.sprite="blue_ghost"
+pink = Ghost(8, 7)
+pink.sprite="pink_ghost"
+yellow=Ghost(8,8)
+yellow.sprite="yellow_ghost"
+
 name = ""
 font_name = "gothic.ttf"
 score = 0
@@ -193,7 +228,7 @@ def write_score():
 
 def draw_text(text, size, x, y):
     font = pygame.font.Font(font_name, size)
-    text_surface = font.render(text, True, (175, 20, 61))
+    text_surface = font.render(text, True, (255,255,255))
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     DISPLAYSURF.blit(text_surface, text_rect)
@@ -254,7 +289,10 @@ def main(playername="mleko"):
     pygame.display.set_caption("Pacman")
     ticks = 0
     pacman_move_counter = 30
-    red_move_counter = 60
+    red_move_counter = 45
+    blue_move_counter=45
+    pink_move_counter=50
+    yellow_move_counter=50
     for row in range(MAPHEIGHT):
         for column in range(MAPWIDTH):
             DISPLAYSURF.blit(TEXTURES[map.tilemap[row][column]], (TILESIZE*column, TILESIZE*row))
@@ -280,19 +318,35 @@ def main(playername="mleko"):
             pacman.move()
         if ticks % red_move_counter == 0:
             red.move()
+        if ticks % blue_move_counter == 0:
+            blue.move()
+        if ticks % pink_move_counter == 0:
+            pink.move()
+        if ticks % yellow_move_counter == 0:
+            yellow.move()
         # rysowanie mapy
-        repaint_map(pacman, red)  # odświeża tylko pola, które trzeba odświeżyć
+        repaint_map(pacman, red, blue,pink,yellow)  # odświeża tylko pola, które trzeba odświeżyć
 
         if not pacman.invincible or ticks % 5 != 0:  # miganie jeśli pacman jest niewrazliwy
             paint_sprite(pacman, True, pacman_move_counter, ticks % pacman_move_counter)
         paint_sprite(red, False, red_move_counter, ticks % red_move_counter)
+        paint_sprite(blue, False, blue_move_counter, ticks % blue_move_counter)
+        paint_sprite(pink, False, pink_move_counter, ticks % pink_move_counter)
+        paint_sprite(yellow, False, yellow_move_counter, ticks % yellow_move_counter)
 
-        draw_text("Score: " + str(score), 30, 380, 15)
-        draw_text("Player: " + name, 30, 140, 15)
+        draw_text("Score: " + str(score), 35, 380, 15)
+        draw_text("Player: " + name, 35, 140, 15)
         for i in range(lives):
             DISPLAYSURF.blit(TEXTURES["heart"], (500+40*i, 10))
 
         if (red.old_pos == pacman.old_pos or red.pos == pacman.old_pos or red.old_pos == pacman.pos) and not pacman.invincible:
+            lives -= 1
+            pacman.invincible = True
+            pacman.inv_time = 400
+            if lives < 1:
+                koniec()
+
+        if (blue.old_pos == pacman.old_pos or blue.pos == pacman.old_pos or blue.old_pos == pacman.pos) and not pacman.invincible:
             lives -= 1
             pacman.invincible = True
             pacman.inv_time = 400

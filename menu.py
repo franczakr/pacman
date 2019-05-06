@@ -19,7 +19,7 @@ ABOUT = ['PAKMAN {0}'.format(0.7),
          PYGAMEMENU_TEXT_NEWLINE,
          "Rafal Franaczak   and   Dominik Guz"]
 COLOR_BACKGROUND = (77, 0, 0)
-COLOR_BLACK = (190, 20, 50)
+COLOR_BLACK = (255,255,255)
 COLOR_WHITE = (105, 0, 21)
 FPS = 60.0
 MENU_BACKGROUND_COLOR = (0, 0, 0)

@@ -42,8 +42,6 @@ DIFFICULTY = ['EASY']
 
 # -----------------------------------------------------------------------------
 
-
-
 def play_function():
     game_engine.main(name)
 

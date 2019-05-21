@@ -7,6 +7,7 @@ from Map import Map, Position
 from astar import astar
 from pygame.locals import *
 from random import randint
+from math import sqrt
 import menu
 
 
@@ -82,21 +83,34 @@ class Game:
                 if pos in self.map.fruits:
                     self.DISPLAYSURF.blit(self.TEXTURES["fruit"], (self.TILESIZE * pos.x, self.TILESIZE * pos.y))
 
+    # zwraca jedną składową pozycji (x lub y)
+    def get_position(self, old_pos, pos, move_counter, current_move_counter):
+        return (old_pos * (move_counter - current_move_counter) + pos * current_move_counter)\
+               * self.TILESIZE / move_counter
+
+    # zwraca odległość od jednej postaci do drugiej
+    def get_distance(self, sprite1, sprite2, ticks):
+        x1 = self.get_position(sprite1.old_pos.x, sprite1.pos.x, sprite1.move_counter, ticks % sprite1.move_counter)
+        x2 = self.get_position(sprite2.old_pos.x, sprite2.pos.x, sprite2.move_counter, ticks % sprite2.move_counter)
+        y1 = self.get_position(sprite1.old_pos.y, sprite1.pos.y, sprite1.move_counter, ticks % sprite1.move_counter)
+        y2 = self.get_position(sprite2.old_pos.y, sprite2.pos.y, sprite2.move_counter, ticks % sprite2.move_counter)
+        return sqrt((x2-x1)**2 + (y2-y1)**2)
+
     # rysowanie pacmana i duszków (średnia ważona starej i nowej pozycji, aby ruch był płynny)
     def paint_sprite(self, sprite, is_pacman, ticks):
         current_move_counter = ticks % sprite.move_counter
         if is_pacman:
             self.DISPLAYSURF.blit(self.PACMAN_SPRITES[sprite.sprite],
-                                  (((self.TILESIZE * sprite.old_pos.x * (sprite.move_counter - current_move_counter)) +
-                                    (self.TILESIZE * sprite.pos.x * current_move_counter)) / sprite.move_counter,
-                                   ((self.TILESIZE * sprite.old_pos.y * (sprite.move_counter - current_move_counter)) +
-                                    (self.TILESIZE * sprite.pos.y * current_move_counter)) / sprite.move_counter))
+                                  (self.get_position(sprite.old_pos.x, sprite.pos.x, sprite.move_counter,
+                                                     current_move_counter),
+                                   self.get_position(sprite.old_pos.y, sprite.pos.y, sprite.move_counter,
+                                                     current_move_counter)))
         else:
             self.DISPLAYSURF.blit(self.GHOST_SPRITES[sprite.sprite],
-                                  (((self.TILESIZE * sprite.old_pos.x * (sprite.move_counter - current_move_counter)) +
-                                    (self.TILESIZE * sprite.pos.x * current_move_counter)) / sprite.move_counter,
-                                   ((self.TILESIZE * sprite.old_pos.y * (sprite.move_counter - current_move_counter)) +
-                                    (self.TILESIZE * sprite.pos.y * current_move_counter)) / sprite.move_counter))
+                                  (self.get_position(sprite.old_pos.x, sprite.pos.x, sprite.move_counter,
+                                                     current_move_counter),
+                                   self.get_position(sprite.old_pos.y, sprite.pos.y, sprite.move_counter,
+                                                     current_move_counter)))
 
     def win(self):
         font = pygame.font.Font('gothic.ttf', 100)
@@ -195,11 +209,10 @@ class Game:
                 self.DISPLAYSURF.blit(self.TEXTURES["heart"], (500+40*i, 10))
 
             for ghost in self.ghosts:
-                if (ghost.old_pos == self.pacman.old_pos or ghost.pos == self.pacman.old_pos
-                        or ghost.old_pos == self.pacman.pos) and not self.pacman.invincible:
+                if self.get_distance(self.pacman, ghost, ticks) < self.TILESIZE * 2 / 3 and not self.pacman.invincible:
                     self.lives -= 1
                     self.pacman.invincible = True
-                    self.pacman.inv_time = 400
+                    self.pacman.inv_time = 200
                     if self.lives < 1:
                         self.end()
                         return self.lives, self.score

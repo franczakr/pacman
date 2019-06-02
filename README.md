@@ -1,3 +1,7 @@
 # Pacman
 
-Gra Pacman zrobiona w Python przy pomocy Pygame jako projekt na studia 
+Gra Pacman zrobiona w Python przy pomocy Pygame jako projekt na studia .
+Aby uruchomić grę w konsoli wpisz:
+- pip install -r requirements.txt
+- python pacman-start.py
+

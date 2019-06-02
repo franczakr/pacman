@@ -1,38 +1,32 @@
-# coding=utf-8
-
-# Import pygame and libraries
-from pygame.locals import *
-from random import randrange
+from pygame.locals import QUIT
+from pygameMenu.locals import PYGAME_MENU_DISABLE_CLOSE, \
+    PYGAMEMENU_TEXT_NEWLINE, PYGAME_MENU_BACK, PYGAME_MENU_EXIT
 import os
 import pygame
 import game_engine
 import csv
 import pygameMenu
-from pygameMenu.locals import *
 
 name = "temporary"
-# Import pygameMenu
-
-
-ABOUT = ['PAKMAN {0}'.format(0.7),
+ABOUT = ['PACMAN {0}'.format(0.7),
          'Authors:',
          PYGAMEMENU_TEXT_NEWLINE,
          "Rafal Franaczak   and   Dominik Guz"]
 COLOR_BACKGROUND = (77, 0, 0)
-COLOR_BLACK = (255,255,255)
+COLOR_BLACK = (255, 255, 255)
 COLOR_WHITE = (105, 0, 21)
 FPS = 60.0
 MENU_BACKGROUND_COLOR = (0, 0, 0)
 WINDOW_SIZE = (800, 800)
+LEADERBOARD_FILE = "Leaderboard.csv"
 
-# -----------------------------------------------------------------------------
 # Init pygame
 pygame.init()
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 # Create pygame screen and objects
 surface = pygame.display.set_mode(WINDOW_SIZE)
-pygame.display.set_caption('MENU_TEST')
+pygame.display.set_caption('Pacman')
 clock = pygame.time.Clock()
 dt = 1 / FPS
 
@@ -40,14 +34,10 @@ dt = 1 / FPS
 DIFFICULTY = ['EASY']
 
 
-# -----------------------------------------------------------------------------
-
 def play_function():
     game_engine.main(name)
 
     while True:
-
-        # Clock tick
         clock.tick(60)
 
 
@@ -55,8 +45,6 @@ def main_background():
     surface.fill(COLOR_BACKGROUND)
 
 
-# -----------------------------------------------------------------------------
-# PLAY MENU
 play_menu = pygameMenu.Menu(surface,
                             bgfun=main_background,
                             color_selected=COLOR_WHITE,
@@ -76,8 +64,6 @@ play_menu = pygameMenu.Menu(surface,
                             window_width=WINDOW_SIZE[0]
                             )
 
-
-# ABOUT MENU
 about_menu = pygameMenu.TextMenu(surface,
                                  bgfun=main_background,
                                  color_selected=COLOR_WHITE,
@@ -102,10 +88,6 @@ for m in ABOUT:
 about_menu.add_line(PYGAMEMENU_TEXT_NEWLINE)
 about_menu.add_option('Return to menu', PYGAME_MENU_BACK)
 
-
-
-
-# LEADERBOARD_MENU
 board_menu = pygameMenu.TextMenu(surface,
                                  bgfun=main_background,
                                  color_selected=COLOR_WHITE,
@@ -126,8 +108,8 @@ board_menu = pygameMenu.TextMenu(surface,
                                  window_width=WINDOW_SIZE[0]
                                  )
 
-# Read the csv.
-with open('L.csv', 'r',) as file:
+
+with open(LEADERBOARD_FILE, 'r',) as file:
     rd = csv.reader(file, delimiter=";")
     score_list = list(rd)
     i = 1
@@ -141,24 +123,23 @@ board_menu.add_option('Return to menu', PYGAME_MENU_BACK)
 
 # TIPS_MENU
 tip_menu = pygameMenu.TextMenu(surface,
-                                 bgfun=main_background,
-                                 color_selected=COLOR_WHITE,
-                                 font="gothic.ttf",
-                                 font_color=COLOR_BLACK,
-                                 font_size_title=50,
-                                 font_title="gothic.ttf",
-                                 menu_color=MENU_BACKGROUND_COLOR,
-                                 menu_color_title=COLOR_WHITE,
-                                 menu_height=int(WINDOW_SIZE[1] * 0.6),
-                                 menu_width=int(WINDOW_SIZE[0] * 0.6),
-                                 onclose=PYGAME_MENU_DISABLE_CLOSE,
-                                 option_shadow=False,
-                                 text_color=COLOR_BLACK,
-                                 text_fontsize=16,
-                                 title='Tips',
-                                 window_height=WINDOW_SIZE[1],
-                                 window_width=WINDOW_SIZE[0]
-                                 )
+                               bgfun=main_background,
+                               color_selected=COLOR_WHITE,
+                               font="gothic.ttf",
+                               font_color=COLOR_BLACK,
+                               font_size_title=50,
+                               font_title="gothic.ttf",
+                               menu_color_title=COLOR_WHITE,
+                               menu_height=int(WINDOW_SIZE[1] * 0.6),
+                               menu_width=int(WINDOW_SIZE[0] * 0.6),
+                               onclose=PYGAME_MENU_DISABLE_CLOSE,
+                               option_shadow=False,
+                               text_color=COLOR_BLACK,
+                               text_fontsize=16,
+                               title='Tips',
+                               window_height=WINDOW_SIZE[1],
+                               window_width=WINDOW_SIZE[0]
+                               )
 tip_menu.add_line("tips will be added SOON...")
 tip_menu.add_line(PYGAMEMENU_TEXT_NEWLINE)
 tip_menu.add_option('Return to menu', PYGAME_MENU_BACK)
@@ -189,25 +170,15 @@ main_menu.add_option('About', about_menu)
 main_menu.add_option('Quit', PYGAME_MENU_EXIT)
 
 
-# -----------------------------------------------------------------------------
 # Main loop
 def mainloop(namen):
     global name
     name = namen
     while True:
-
-        # Tick
         clock.tick(60)
-
-        # Application events
         events = pygame.event.get()
         for event in events:
             if event.type == QUIT:
                 exit()
-
-        # Main menu
         main_menu.mainloop(events)
-
-        # Flip surface
         pygame.display.flip()
-

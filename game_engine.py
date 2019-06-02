@@ -3,9 +3,9 @@ import sys
 import csv
 import operator
 import time
-from Map import Map, Position
+from pygame.locals import QUIT, KEYDOWN, K_RIGHT, K_UP, K_LEFT, K_DOWN
+from map import Map, Position, FR, WL, MAPHEIGHT, MAPWIDTH
 from astar import astar
-from pygame.locals import *
 from random import randint
 from math import sqrt
 import menu
@@ -21,13 +21,7 @@ def main(name):
 
 
 class Game:
-    # STAŁE
-    # typy powierzchni
-    FR = 0
-    WL = 1
     TILESIZE = 50
-    MAPWIDTH = 16
-    MAPHEIGHT = 16
     DISPLAYSURF = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE))
     black = (0, 0, 0)
     crimson = (105, 0, 21)
@@ -75,13 +69,15 @@ class Game:
         self.ghosts = [red, blue, pink, yellow]
 
     def repaint_map(self, *sprites_on_map):
-        for column in range(self.MAPWIDTH):
-                self.DISPLAYSURF.blit(self.TEXTURES[self.map.tilemap[0][column]], (self.TILESIZE*column, 0))
+        for column in range(MAPWIDTH):
+            self.DISPLAYSURF.blit(self.TEXTURES[self.map.tilemap[0][column]], (self.TILESIZE*column, 0))
         for sprite in sprites_on_map:
             for pos in [sprite.pos, sprite.old_pos]:
-                self.DISPLAYSURF.blit(self.TEXTURES[self.map.tilemap[pos.y][pos.x]], (self.TILESIZE * pos.x, self.TILESIZE * pos.y))
+                self.DISPLAYSURF.blit(self.TEXTURES[self.map.tilemap[pos.y][pos.x]],
+                                      (self.TILESIZE * pos.x, self.TILESIZE * pos.y))
                 if pos in self.map.fruits:
-                    self.DISPLAYSURF.blit(self.TEXTURES["fruit"], (self.TILESIZE * pos.x, self.TILESIZE * pos.y))
+                    self.DISPLAYSURF.blit(self.TEXTURES["fruit"],
+                                          (self.TILESIZE * pos.x, self.TILESIZE * pos.y))
 
     # zwraca jedną składową pozycji (x lub y)
     def get_position(self, old_pos, pos, move_counter, current_move_counter):
@@ -170,11 +166,13 @@ class Game:
         pygame.init()
         pygame.display.set_caption("Pacman")
         ticks = 0
-        for row in range(self.MAPHEIGHT):
-            for column in range(self.MAPWIDTH):
-                self.DISPLAYSURF.blit(self.TEXTURES[self.map.tilemap[row][column]], (self.TILESIZE*column, self.TILESIZE*row))
+        for row in range(MAPHEIGHT):
+            for column in range(MAPWIDTH):
+                self.DISPLAYSURF.blit(self.TEXTURES[self.map.tilemap[row][column]],
+                                      (self.TILESIZE*column, self.TILESIZE*row))
         for fruit in self.map.fruits:
-            self.DISPLAYSURF.blit(self.TEXTURES["fruit"], (self.TILESIZE * fruit.x, self.TILESIZE * fruit.y))
+            self.DISPLAYSURF.blit(self.TEXTURES["fruit"],
+                                  (self.TILESIZE * fruit.x, self.TILESIZE * fruit.y))
         while True:
             self.repaint_map(self.pacman, *self.ghosts)  # odświeża tylko pola, które trzeba odświeżyć
             # obsługa eventów i klawiszy
@@ -263,18 +261,18 @@ class Pacman:
             new_y -= 1
 
         if new_y < 0:
-            new_y = game.MAPHEIGHT + new_y
+            new_y = MAPHEIGHT + new_y
             teleport = True
-        if new_y >= game.MAPHEIGHT:
-            new_y = new_y - game.MAPHEIGHT
+        if new_y >= MAPHEIGHT:
+            new_y = new_y - MAPHEIGHT
             teleport = True
         if new_x < 0:
-            new_x = game.MAPWIDTH + new_x
+            new_x = MAPWIDTH + new_x
             teleport = True
-        if new_x >= game.MAPWIDTH:
-            new_x = new_x - game.MAPWIDTH
+        if new_x >= MAPWIDTH:
+            new_x = new_x - MAPWIDTH
             teleport = True
-        if game.map.tilemap[new_y][new_x] != game.WL:
+        if game.map.tilemap[new_y][new_x] != WL:
             self.pos = Position(new_x, new_y)
             if teleport:
                 self.move(game)
@@ -297,11 +295,11 @@ class Ghost:
         tmp = Position(x, y)
         if self.sprite == "blue_ghost":
             if game.pacman.direction == "right":
-                tmp.x = min(game.MAPWIDTH - 2, (tmp.x + 4))
+                tmp.x = min(MAPWIDTH - 2, (tmp.x + 4))
             if game.pacman.direction == "left":
                 tmp.x = max((tmp.x - 4), 2)
             if game.pacman.direction == "up":
-                tmp.y = min((tmp.y + 4), game.MAPHEIGHT - 2)
+                tmp.y = min((tmp.y + 4), MAPHEIGHT - 2)
             if game.pacman.direction == "down":
                 tmp.y = max((tmp.y - 4), 2)
 
@@ -313,8 +311,8 @@ class Ghost:
             tmp.x = game.pacman.pos.x + randint(0, 4)
             tmp.y = game.pacman.pos.y + randint(0, 4)
 
-        if tmp.x < 0 or tmp.x >= game.MAPWIDTH or tmp.y < 0 or tmp.y >= game.MAPHEIGHT or \
-                game.map.tilemap[tmp.y][tmp.x] == game.WL:
+        if tmp.x < 0 or tmp.x >= MAPWIDTH or tmp.y < 0 or tmp.y >= MAPHEIGHT or \
+                game.map.tilemap[tmp.y][tmp.x] == WL:
             tmp.x = game.pacman.pos.x
             tmp.y = game.pacman.pos.y
 
@@ -343,18 +341,18 @@ class Ghost:
             new_y -= 1
 
         if new_y < 0:
-            new_y = game.MAPHEIGHT + new_y
+            new_y = MAPHEIGHT + new_y
             teleport = True
-        if new_y >= game.MAPHEIGHT:
-            new_y = new_y - game.MAPHEIGHT
+        if new_y >= MAPHEIGHT:
+            new_y = new_y - MAPHEIGHT
             teleport = True
         if new_x < 0:
-            new_x = game.MAPWIDTH + new_x
+            new_x = MAPWIDTH + new_x
             teleport = True
-        if new_x >= game.MAPWIDTH:
-            new_x = new_x - game.MAPWIDTH
+        if new_x >= MAPWIDTH:
+            new_x = new_x - MAPWIDTH
             teleport = True
-        if game.map.tilemap[new_y][new_x] != game.WL:
+        if game.map.tilemap[new_y][new_x] != WL:
             self.pos = Position(new_x, new_y)
             if teleport:
                 self.move(game)
@@ -362,7 +360,7 @@ class Ghost:
 
 def draw_text(text, size, x, y):
     font = pygame.font.Font(Game.font_name, size)
-    text_surface = font.render(text, True, (255,255,255))
+    text_surface = font.render(text, True, (255, 255, 255))
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     Game.DISPLAYSURF.blit(text_surface, text_rect)
@@ -370,13 +368,13 @@ def draw_text(text, size, x, y):
 
 def write_score(name, score):
     tuple1 = (int(score), name)
-    with open('L.csv', 'r') as file:
+    with open(menu.LEADERBOARD_FILE, 'r') as file:
         rd = csv.reader(file, delimiter=";")
         score_list = list(rd)
     file.close()
-    file = open('L.csv', 'w')
+    file = open(menu.LEADERBOARD_FILE, 'w')
     file.close()
-    with open('L.csv', 'w', newline='') as file:
+    with open(menu.LEADERBOARD_FILE, 'w', newline='') as file:
         for r in score_list:
             r[0] = int(r[0])
         tplist = [tuple(r) for r in score_list]

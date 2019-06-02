@@ -33,12 +33,12 @@ class TextBox(pygame.sprite.Sprite):
 screen = pygame.display.set_mode([800, 800])
 textBox = TextBox()
 shiftDown = False
-textBox.rect.center = [400,400]
+textBox.rect.center = [400, 400]
 
 
 running = True
 while running:
-    screen.fill([0,0,0])
+    screen.fill([0, 0, 0])
     screen.blit(textBox.image, textBox.rect)
     pygame.display.flip()
     for e in pygame.event.get():

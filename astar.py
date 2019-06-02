@@ -1,4 +1,4 @@
-import Map
+from map import Position
 
 
 class Node:
@@ -46,9 +46,11 @@ def astar(map, start, end):
 
         children = []
         for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
-            node_position = Map.Position(current_node.position.x + new_position[0], current_node.position.y + new_position[1])
+            node_position = Position(current_node.position.x + new_position[0],
+                                     current_node.position.y + new_position[1])
 
-            if node_position.y > (len(map) - 1) or node_position.y < 0 or node_position.x > (len(map[len(map)-1]) -1) or node_position.x < 0:
+            if node_position.y > (len(map) - 1) or node_position.y < 0 or node_position.x > (len(map[len(map)-1]) - 1)\
+                    or node_position.x < 0:
                 continue
 
             if map[node_position.y][node_position.x] != 0:

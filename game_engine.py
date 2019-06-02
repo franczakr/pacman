@@ -72,10 +72,10 @@ class Game:
         self.score = score
         self.pacman = Pacman(1, 1, 30)
         # GHOSTS
-        red = Ghost(7, 7, 45, "red_ghost")
-        blue = Ghost(7, 8, 50, "blue_ghost")
-        pink = Ghost(8, 7, 60, "pink_ghost")
-        yellow = Ghost(8, 8, 70, "yellow_ghost")
+        red = Ghost(14, 14, 45, "red_ghost")
+        blue = Ghost(12, 8, 50, "blue_ghost")
+        pink = Ghost(7, 7, 60, "pink_ghost")
+        yellow = Ghost(1, 14, 70, "yellow_ghost")
         self.ghosts = [red, blue, pink, yellow]
 
     def repaint_map(self, *sprites_on_map):
@@ -271,7 +271,7 @@ class Ghost:
             tmp.y = game.pacman.pos.y
 
         path = astar(game.map.tilemap, self.pos, tmp)
-        if path.__len__() > 1:
+        if path is not None and path.__len__() > 1:
             path = path[1]
             if path.y > self.pos.y:
                 self.direction = "down"

@@ -8,29 +8,39 @@ from map import Map, Position, FR, WL, MAPHEIGHT, MAPWIDTH
 from astar import astar
 from random import randint
 from math import sqrt
+import map_loader
 import menu
+
+TILESIZE = 50
+DISPLAYSURF = pygame.display.set_mode((MAPWIDTH * TILESIZE, MAPHEIGHT * TILESIZE))
+black = (0, 0, 0)
+crimson = (105, 0, 21)
+font_name = "gothic.ttf"
+
+X = MAPWIDTH * TILESIZE
+Y = MAPHEIGHT * TILESIZE
 
 
 def main(name):
     (lives, score) = (5, 0)
-    while lives > 0:
-        game = Game(name, lives, score)
-        (lives, score) = game.start()
+    maps_files = map_loader.load_maps()
+    for map_file in maps_files:
+        if lives > 0:
+            if score > 0:
+                win_map(score)
+            game = Game(name, map_file, lives, score)
+            (lives, score) = game.start()
+        else:
+            break
     write_score(name, score)
+    if lives > 0:
+        end_win(score)
+    else:
+        end_lost(score)
     menu.mainloop(name)
 
 
 class Game:
-    TILESIZE = 50
-    DISPLAYSURF = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE))
-    black = (0, 0, 0)
-    crimson = (105, 0, 21)
-    font_name = "gothic.ttf"
-
-    # assigning values to X and Y variable
-    X = MAPWIDTH * TILESIZE
-    Y = MAPHEIGHT * TILESIZE
-
     TEXTURES = {
         WL: pygame.image.load("res/wall.png"),
         FR: pygame.image.load("res/floor.png"),
@@ -52,11 +62,11 @@ class Game:
         "yellow_ghost": pygame.image.load("res/yellow.png")
     }
 
-    def __init__(self, playername, lives=5, score=0):
+    def __init__(self, playername, map_file, lives=5, score=0):
         self.name = playername
         self.clock = pygame.time.Clock()
-        self.map = Map()
-        self.map.init_map()
+        tilemap = map_loader.parse_map(map_file)
+        self.map = Map(tilemap)
         self.map.init_fruits()
         self.lives = lives
         self.score = score
@@ -70,19 +80,19 @@ class Game:
 
     def repaint_map(self, *sprites_on_map):
         for column in range(MAPWIDTH):
-            self.DISPLAYSURF.blit(self.TEXTURES[self.map.tilemap[0][column]], (self.TILESIZE*column, 0))
+            DISPLAYSURF.blit(self.TEXTURES[self.map.tilemap[0][column]], (TILESIZE*column, 0))
         for sprite in sprites_on_map:
             for pos in [sprite.pos, sprite.old_pos]:
-                self.DISPLAYSURF.blit(self.TEXTURES[self.map.tilemap[pos.y][pos.x]],
-                                      (self.TILESIZE * pos.x, self.TILESIZE * pos.y))
+                DISPLAYSURF.blit(self.TEXTURES[self.map.tilemap[pos.y][pos.x]],
+                                 (TILESIZE * pos.x, TILESIZE * pos.y))
                 if pos in self.map.fruits:
-                    self.DISPLAYSURF.blit(self.TEXTURES["fruit"],
-                                          (self.TILESIZE * pos.x, self.TILESIZE * pos.y))
+                    DISPLAYSURF.blit(self.TEXTURES["fruit"],
+                                     (TILESIZE * pos.x, TILESIZE * pos.y))
 
     # zwraca jedną składową pozycji (x lub y)
     def get_position(self, old_pos, pos, move_counter, current_move_counter):
         return (old_pos * (move_counter - current_move_counter) + pos * current_move_counter)\
-               * self.TILESIZE / move_counter
+               * TILESIZE / move_counter
 
     # zwraca odległość od jednej postaci do drugiej
     def get_distance(self, sprite1, sprite2, ticks):
@@ -96,71 +106,17 @@ class Game:
     def paint_sprite(self, sprite, is_pacman, ticks):
         current_move_counter = ticks % sprite.move_counter
         if is_pacman:
-            self.DISPLAYSURF.blit(self.PACMAN_SPRITES[sprite.sprite],
-                                  (self.get_position(sprite.old_pos.x, sprite.pos.x, sprite.move_counter,
-                                                     current_move_counter),
-                                   self.get_position(sprite.old_pos.y, sprite.pos.y, sprite.move_counter,
-                                                     current_move_counter)))
+            DISPLAYSURF.blit(self.PACMAN_SPRITES[sprite.sprite],
+                             (self.get_position(sprite.old_pos.x, sprite.pos.x, sprite.move_counter,
+                                                current_move_counter),
+                              self.get_position(sprite.old_pos.y, sprite.pos.y, sprite.move_counter,
+                                                current_move_counter)))
         else:
-            self.DISPLAYSURF.blit(self.GHOST_SPRITES[sprite.sprite],
-                                  (self.get_position(sprite.old_pos.x, sprite.pos.x, sprite.move_counter,
-                                                     current_move_counter),
-                                   self.get_position(sprite.old_pos.y, sprite.pos.y, sprite.move_counter,
-                                                     current_move_counter)))
-
-    def win(self):
-        font = pygame.font.Font('gothic.ttf', 100)
-        text = font.render('You win this level', True, self.crimson)
-        text_rect = text.get_rect()
-        text_rect.center = (self.X // 2, self.Y // 2)
-        font2 = pygame.font.Font('gothic.ttf', 30)
-        text2 = font2.render('Your current score: ' + str(self.score), True, self.crimson)
-        text_rect2 = text2.get_rect()
-        text_rect2.center = (self.X // 2, self.Y * 2 // 3)
-        text3 = font2.render('Press any key to continue', True, self.crimson)
-        text_rect3 = text3.get_rect()
-        text_rect3.center = (self.X // 2, self.Y * 2 // 3 + 30)
-        self.DISPLAYSURF.fill(self.black)
-        self.DISPLAYSURF.blit(text, text_rect)
-        pygame.display.update()
-        self.DISPLAYSURF.blit(text2, text_rect2)
-        pygame.display.update()
-        time.sleep(1)
-        self.DISPLAYSURF.blit(text3, text_rect3)
-        pygame.display.update()
-        pygame.event.get()
-        while True:
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.KEYUP:
-                    return
-
-    def end(self):
-        pygame.display.set_caption('DEATH')
-        font = pygame.font.Font('gothic.ttf', 100)
-        text = font.render('YOU DIED', True, self.crimson, self.black)
-        text_rect = text.get_rect()
-        text_rect.center = (self.X // 2, self.Y // 2)
-        font2 = pygame.font.Font('gothic.ttf', 30)
-        text2 = font2.render('Press any key to exit', True, self.crimson, self.black)
-        text_rect2 = text2.get_rect()
-        text_rect2.center = (self.X // 2, self.Y * 2 // 3)
-        self.DISPLAYSURF.fill(self.black)
-        self.DISPLAYSURF.blit(text, text_rect)
-        pygame.display.update()
-        time.sleep(1)
-        self.DISPLAYSURF.blit(text2, text_rect2)
-        pygame.display.update()
-        pygame.event.get()
-        while True:
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.KEYUP:
-                    return
+            DISPLAYSURF.blit(self.GHOST_SPRITES[sprite.sprite],
+                             (self.get_position(sprite.old_pos.x, sprite.pos.x, sprite.move_counter,
+                                                current_move_counter),
+                              self.get_position(sprite.old_pos.y, sprite.pos.y, sprite.move_counter,
+                                                current_move_counter)))
 
     def start(self):
         pygame.init()
@@ -168,11 +124,11 @@ class Game:
         ticks = 0
         for row in range(MAPHEIGHT):
             for column in range(MAPWIDTH):
-                self.DISPLAYSURF.blit(self.TEXTURES[self.map.tilemap[row][column]],
-                                      (self.TILESIZE*column, self.TILESIZE*row))
+                DISPLAYSURF.blit(self.TEXTURES[self.map.tilemap[row][column]],
+                                 (TILESIZE*column, TILESIZE*row))
         for fruit in self.map.fruits:
-            self.DISPLAYSURF.blit(self.TEXTURES["fruit"],
-                                  (self.TILESIZE * fruit.x, self.TILESIZE * fruit.y))
+            DISPLAYSURF.blit(self.TEXTURES["fruit"],
+                             (TILESIZE * fruit.x, TILESIZE * fruit.y))
         while True:
             self.repaint_map(self.pacman, *self.ghosts)  # odświeża tylko pola, które trzeba odświeżyć
             # obsługa eventów i klawiszy
@@ -204,19 +160,17 @@ class Game:
             draw_text("Score: " + str(self.score), 35, 380, 15)
             draw_text("Player: " + self.name, 35, 140, 15)
             for i in range(self.lives):
-                self.DISPLAYSURF.blit(self.TEXTURES["heart"], (500+40*i, 10))
+                DISPLAYSURF.blit(self.TEXTURES["heart"], (500+40*i, 10))
 
             for ghost in self.ghosts:
-                if self.get_distance(self.pacman, ghost, ticks) < self.TILESIZE * 2 / 3 and not self.pacman.invincible:
+                if self.get_distance(self.pacman, ghost, ticks) < TILESIZE * 2 / 3 and not self.pacman.invincible:
                     self.lives -= 1
                     self.pacman.invincible = True
                     self.pacman.inv_time = 200
                     if self.lives < 1:
-                        self.end()
                         return self.lives, self.score
 
             if not self.map.fruits:
-                self.win()
                 return self.lives, self.score
 
             if self.pacman.invincible:
@@ -359,11 +313,11 @@ class Ghost:
 
 
 def draw_text(text, size, x, y):
-    font = pygame.font.Font(Game.font_name, size)
+    font = pygame.font.Font(font_name, size)
     text_surface = font.render(text, True, (255, 255, 255))
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
-    Game.DISPLAYSURF.blit(text_surface, text_rect)
+    DISPLAYSURF.blit(text_surface, text_rect)
 
 
 def write_score(name, score):
@@ -386,3 +340,45 @@ def write_score(name, score):
         wrt = csv.writer(file, delimiter=";")
         for t in tplist:
             wrt.writerow(t)
+
+
+def win_map(score):
+    show_end_screen('You win this level', 'Your current score is ' + str(score), 'Press any key to continue', 70)
+
+
+def end_win(score):
+    show_end_screen('YOU WIN THE GAME', 'Your score is ' + str(score), 'Press any key to exit', 70)
+
+
+def end_lost(score):
+    show_end_screen('YOU DIED', 'Your score is ' + str(score), 'Press any key to exit')
+
+
+def show_end_screen(big_text, medium_text, small_text, big_text_font_size=100):
+    font = pygame.font.Font('gothic.ttf', big_text_font_size)
+    text = font.render(big_text, True, crimson)
+    text_rect = text.get_rect()
+    text_rect.center = (X // 2, Y // 2)
+    font2 = pygame.font.Font('gothic.ttf', 30)
+    text2 = font2.render(medium_text, True, crimson)
+    text_rect2 = text2.get_rect()
+    text_rect2.center = (X // 2, Y * 2 // 3)
+    text3 = font2.render(small_text, True, crimson)
+    text_rect3 = text3.get_rect()
+    text_rect3.center = (X // 2, Y * 2 // 3 + 30)
+    DISPLAYSURF.fill(black)
+    DISPLAYSURF.blit(text, text_rect)
+    pygame.display.update()
+    DISPLAYSURF.blit(text2, text_rect2)
+    pygame.display.update()
+    time.sleep(1)
+    DISPLAYSURF.blit(text3, text_rect3)
+    pygame.display.update()
+    pygame.event.get()
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYUP:
+                return

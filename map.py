@@ -23,25 +23,8 @@ class Map:
     tilemap = []
     fruits = set()
 
-    def init_map(self):
-        self.tilemap = [
-            [WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL],
-            [WL, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, WL],
-            [WL, FR, WL, WL, WL, FR, WL, FR, WL, WL, FR, WL, WL, WL, FR, WL],
-            [FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, WL, FR, FR, FR],
-            [FR, FR, WL, FR, WL, WL, WL, FR, FR, WL, FR, FR, WL, WL, FR, FR],
-            [WL, FR, WL, FR, WL, FR, FR, FR, WL, WL, WL, FR, FR, FR, FR, WL],
-            [WL, FR, WL, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, WL],
-            [WL, FR, FR, FR, WL, WL, WL, FR, FR, FR, WL, WL, WL, WL, FR, WL],
-            [WL, FR, WL, FR, FR, FR, FR, FR, WL, FR, FR, FR, FR, FR, FR, WL],
-            [WL, FR, FR, FR, WL, WL, WL, FR, WL, FR, FR, FR, FR, FR, FR, WL],
-            [WL, FR, WL, FR, FR, FR, FR, FR, WL, WL, WL, WL, FR, WL, FR, WL],
-            [FR, FR, FR, FR, WL, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR],
-            [FR, FR, WL, FR, WL, WL, WL, FR, FR, WL, WL, WL, FR, FR, FR, FR],
-            [WL, FR, FR, FR, FR, FR, WL, FR, FR, WL, FR, FR, FR, WL, FR, WL],
-            [WL, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, FR, WL],
-            [WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL],
-        ]
+    def __init__(self, tilemap):
+        self.tilemap = tilemap
 
     def init_fruits(self):
         for x in range(1, MAPWIDTH - 1):
